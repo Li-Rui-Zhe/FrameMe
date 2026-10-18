@@ -8,13 +8,13 @@
 
 **GIF 表情包 · 免费纯色去背景 · PNG 逐帧动画**
 
-为 [**BytePet**](https://github.com/Li-Rui-Zhe/BytePet) 打磨角色动作时做的小工具，
-现在也可以成为你的图片与动画素材工作台。
+开源动画素材工作台，支持六帧动作 Prompt、序列帧切割、免费纯色背景移除、手动修补与 GIF / PNG 导出。
+一张图，连成一个完整动作，轻松制作表情包、贴纸与逐帧动画。
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-4364ed?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Local](https://img.shields.io/badge/Processing-Local-16745f?style=flat-square)](#-快速开始)
 [![MIT](https://img.shields.io/badge/License-MIT-4364ed?style=flat-square)](LICENSE)
-[![BytePet](https://img.shields.io/badge/Made_for-BytePet-b4e2cc?style=flat-square)](https://github.com/Li-Rui-Zhe/BytePet)
+[![BytePet](https://img.shields.io/badge/Example-BytePet-b4e2cc?style=flat-square)](https://github.com/Li-Rui-Zhe/BytePet)
 
 [快速开始](#-快速开始) · [一张图怎么变成动画](#-一张图怎么变成动画) · [与 BytePet 一起用](#-与-bytepet-一起用) · [Prompt 指南](docs/PROMPT_GUIDE.md)
 
@@ -27,13 +27,13 @@
 
 ## 👋 为什么有 FrameMe
 
-做 BytePet 时，我需要把生成好的角色长条图切成每一帧，去掉背景，对齐大小，再整理成能被程序读取的动作目录。步骤不复杂，重复做起来却很费时间。
+制作表情包、贴纸和逐帧动画时，常常需要把角色长条图切成每一帧，去掉背景，对齐大小，再整理文件名。步骤不复杂，重复做起来却很费时间。
 
-于是有了 FrameMe：把 **Prompt 示例、切帧、去底、手动修补、动画预览和下载** 放到一个工作台里。最初为桌宠准备素材，也适合做表情包、贴纸、游戏角色和产品动效。
+FrameMe 把 **Prompt 示例、切帧、去底、手动修补、动画预览和下载** 放到一个工作台里，帮助你把图片整理成可直接使用的动画素材，适用于表情包、贴纸、游戏角色、桌宠和产品动效。
 
-> **FrameMe 准备每一帧，BytePet 让角色住进桌面。**
+> **为每一种创意，准备好每一帧。**
 >
-> [FrameMe 源码](https://github.com/Li-Rui-Zhe/FrameMe) · [BytePet 源码与下载](https://github.com/Li-Rui-Zhe/BytePet)
+> 内置案例来自开源桌宠项目 [BytePet](https://github.com/Li-Rui-Zhe/BytePet)，你也可以上传自己的素材，完成相同的处理流程。
 
 ## 🎞️ 一张图怎么变成动画
 
@@ -126,6 +126,8 @@ python app.py
 
 ## 🤝 与 BytePet 一起用
 
+以下是一个实际应用示例；导出的素材也可以用于其他支持 GIF 或 PNG 序列的项目。
+
 [**BytePet**](https://github.com/Li-Rui-Zhe/BytePet) 是我的开源桌面 AI 伙伴项目，支持 PNG 序列帧角色资源。FrameMe 负责把动作素材准备好，BytePet 负责让这些动作在桌面上播放。
 
 | 项目 | 做什么 |
@@ -185,4 +187,4 @@ python -m unittest discover -s tests -v
 
 代码采用 **[MIT License](LICENSE)**。BytePet 原始素材保留其许可证与来源记录；开心优化演示版单独标注，详见 [素材说明](THIRD_PARTY_NOTICES.md)。
 
-感谢你使用 FrameMe。也欢迎看看它最初服务的项目 [**BytePet**](https://github.com/Li-Rui-Zhe/BytePet)，把准备好的每一帧，变成桌面上的陪伴。
+感谢你使用 FrameMe。欢迎用自己的素材创作，也可以通过 [**BytePet** 案例](docs/examples/bytepet.md) 体验从图片处理到动画应用的完整流程。
