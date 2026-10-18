@@ -1,0 +1,21 @@
+<aside class="sidebar">
+  <a class="brand" id="brand-home" href="/editor" aria-label="帧的么 FrameMe 工作台"><span class="brand-mark">{{ icon('isle') }}</span><span class="brand-wordmark"><span class="brand-name">帧的么 <small>FrameMe</small></span><span class="brand-caption">图片与动画素材工作台</span></span></a>
+  <div class="nav-caption">你的创作空间 <span>WORKSPACE</span></div>
+  <nav class="tool-nav" aria-label="工具">
+    <a class="nav-item nav-about{% if about_page and not prompt_page %} active{% endif %}" id="about-link" href="/about" {% if about_page and not prompt_page %}aria-current="page"{% endif %} title="项目介绍" aria-label="项目介绍">{{ icon('book') }}<span>项目介绍</span><span class="nav-number">ABOUT</span></a>
+    {% if about_page %}
+    <a class="nav-item" href="/editor?tool=split" title="序列帧切割" aria-label="序列帧切割">{{ icon('split') }}<span>序列帧切割</span><span class="nav-number">01</span></a>
+    <a class="nav-item" href="/editor?tool=cutout" title="背景移除" aria-label="背景移除">{{ icon('cut') }}<span>背景移除</span><span class="nav-number">02</span></a>
+    <a class="nav-item" href="/editor?tool=rename" title="批量命名" aria-label="批量命名">{{ icon('type') }}<span>批量命名</span><span class="nav-number">03</span></a>
+    {% else %}
+    <button class="nav-item active" data-tool="split" aria-current="page">{{ icon('split') }}<span>序列帧切割</span><span class="nav-number">01</span></button>
+    <button class="nav-item" data-tool="cutout">{{ icon('cut') }}<span>背景移除</span><span class="nav-number">02</span></button>
+    <button class="nav-item" data-tool="rename">{{ icon('type') }}<span>批量命名</span><span class="nav-number">03</span></button>
+    {% endif %}
+    <a class="nav-item{% if prompt_page %} active{% endif %}" id="prompts-link" href="/prompts" {% if prompt_page %}aria-current="page"{% endif %} title="Prompt 示例" aria-label="Prompt 示例">{{ icon('book') }}<span>Prompt 示例</span><span class="nav-number">04</span></a>
+  </nav>
+  <div class="nav-divider"></div>
+  {% if about_page %}<a class="nav-item" href="/editor?tool=history">{{ icon('history') }}<span>最近任务</span><span id="history-count" class="history-count">0</span></a>{% else %}<button class="nav-item" data-tool="history">{{ icon('history') }}<span>最近任务</span><span id="history-count" class="history-count">0</span></button>{% endif %}
+  <div class="sidebar-note"><div class="island-art" aria-hidden="true"><span class="island-frame one"></span><span class="island-frame two"></span><span class="island-frame three">{{ icon('spark') }}</span><span class="island-orbit"></span></div><span class="note-kicker">A LITTLE ISLAND OF IDEAS</span><strong>让每一份素材，<br>找到它的下一站。</strong><p>游戏动画 / 表情贴纸<br>插画资源 / 产品动效</p>{% if about_page %}<a class="sidebar-sample" href="/editor?tool=split&amp;demo=1">试试 BytePet 示例 {{ icon('arrow') }}</a>{% else %}<button id="sidebar-demo">从一个小示例开始 {{ icon('arrow') }}</button>{% endif %}</div>
+  <div class="sidebar-bottom">{% if about_page %}<a class="sidebar-guide" href="{{ '#prompt-guide' if prompt_page else '#about-how' }}">{{ icon('help') }} 使用指南</a>{% else %}<button id="help-button">{{ icon('help') }} 使用指南</button>{% endif %}<span class="sidebar-edition">FRAMEME STUDIO <span class="version">01</span></span></div>
+</aside>

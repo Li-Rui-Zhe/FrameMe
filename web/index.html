@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="帧的么 FrameMe 素材工作台：切割动画序列帧、移除纯色背景、统一尺寸与批量命名，预览并导出 PNG、GIF 和 ZIP。">
+  <meta name="color-scheme" content="light dark">
+  <meta name="framelab-workspace-scope" content="{{ workspace_scope }}">
+  <title>帧的么 FrameMe — 创作工作台</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/draft-store.js" defer></script>
+  <script src="/static/retouch.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body data-page="editor">
+{% from 'icons.html' import icon %}{% include 'icons.html' %}
+<input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+<div class="app-shell">
+  {% include 'sidebar.html' %}
+  <div class="main-shell">
+    <header class="topbar"><div class="breadcrumb"><span class="breadcrumb-brand">帧的么工作台</span><span>/</span> <strong id="breadcrumb-tool">序列帧切割</strong></div><div class="top-actions"><span class="save-indicator" id="save-indicator" data-status="saving" role="status"><span></span><span id="save-status">正在恢复工作区</span></span><button id="theme-button" class="icon-button" aria-label="切换深色主题">{{ icon('moon') }}</button><button class="button small secondary" id="top-upload">{{ icon('plus') }} 上传素材</button></div></header>
+    <main>
+      <section class="creation-context" aria-label="当前创作流程">
+        <div class="creation-tool"><span class="heading-icon" id="creation-tool-icon">{{ icon('split') }}</span><div><strong id="creation-tool-name">序列帧切割</strong><p id="creation-guidance">选好工具，上传图片就能开始。</p></div></div>
+        <div class="workflow" aria-label="处理步骤"><span class="step active" id="step-upload"><b>1</b>选择图片</span><span class="step-line"></span><span class="step" id="step-settings"><b>2</b><span id="step-process-label">处理素材</span></span><span class="step-line"></span><span class="step" id="step-export"><b>3</b>下载结果</span></div>
+      </section>
+      <section class="intro editor-context" id="editor-intro" hidden><div><h1 id="page-title">你的素材，已准备好。</h1><p id="page-description">继续完成处理，即可下载。</p></div><div class="editor-actions"><button id="empty-demo" class="button secondary small" type="button" disabled>{{ icon('play') }} 试用示例</button></div></section>
+      <section id="workspace-view" aria-label="素材创作工作区" hidden>
+        <section id="bytepet-example" class="example-card" aria-label="BytePet 真实项目案例">
+          <img id="example-thumbnail" class="example-thumbnail checker" src="/static/examples/bytepet/calm-thumbnail.png" alt="BytePet 默认角色">
+          <div class="example-copy"><div><span id="example-badge" class="case-badge">真实项目案例</span><a id="example-project-link" href="https://github.com/Li-Rui-Zhe/BytePet" target="_blank" rel="noopener noreferrer">BytePet {{ icon('arrow') }}</a><span id="example-local-source" hidden>原工具上传素材</span></div><p id="example-details">512 × 512 透明 PNG · 保留项目的动作命名与播放速度</p><p id="example-purpose">长条切割 → 逐帧预览 → 动作目录导出</p></div>
+          <label class="example-state"><span id="example-select-label">选择动作</span><select id="example-select" aria-label="选择当前工具的演示素材"><option value="calm">平静待机 · calm</option><option value="happy">开心 · happy</option><option value="run_right">向右跑 · run_right</option></select></label>
+          <button id="example-load" class="button secondary small">{{ icon('spark') }} 一键试用</button>
+        </section>
+<div class="output-bar panel" hidden><div><span id="output-status" class="output-status">等待导入素材</span><p id="output-description">处理完成后，可下载序列帧或导出动画。</p></div><div class="download-actions"><label class="format-picker" for="export-format">下载格式<select id="export-format"><option value="gif">GIF 动图 / 表情包</option><option value="zip">PNG 逐帧图片（ZIP）</option><option value="png">当前图片 PNG</option><option value="sheet">精灵图 PNG</option><option value="folders">分组图片（ZIP）</option></select></label><button id="quick-download" class="button primary" disabled>{{ icon('download') }} 下载结果</button></div></div>
+        <div class="workspace-grid">
+          <div class="canvas-column">
+            <section class="panel preview-panel" aria-label="素材预览">
+              <div class="panel-heading"><div class="panel-title"><span class="heading-icon">{{ icon('image') }}</span> 素材预览 <span id="preview-badge" class="badge">示例</span></div><div class="segmented" id="view-toggle"><button data-view="animation" class="selected">动画</button><button data-view="source">原图 / 裁剪</button></div></div>
+              <div class="preview-stage checker" id="preview-stage" data-background="checker">
+                <div class="stage-top"><span class="stage-label" id="stage-label">DEMO / FLOATING FRIEND</span><div class="background-options" aria-label="预览背景"><button class="bg-swatch checker selected" data-background="checker" aria-label="透明棋盘背景" title="透明棋盘"></button><button class="bg-swatch white" data-background="white" aria-label="白色背景" title="白色"></button><button class="bg-swatch dark" data-background="dark" aria-label="深色背景" title="深色"></button></div></div>
+                <canvas id="preview-canvas" aria-label="动画预览，原图模式下可拖动裁剪线"></canvas>
+                <div class="stage-bottom"><span id="canvas-info">256 × 256 px</span><button id="load-demo" class="demo-pill">{{ icon('spark') }} 载入这组示例 {{ icon('arrow') }}</button><span id="frame-indicator">FRAME 01 / 06</span></div>
+              </div>
+              <div id="retouch-entry" class="retouch-entry" hidden><div><strong>背景还没去干净？</strong><span id="retouch-entry-hint">用画笔擦掉多余部分，也能恢复误删的内容。</span></div><button id="retouch-open" class="button secondary small" type="button">{{ icon('sliders') }} 手动修补</button></div>
+              <div class="playback"><div class="playback-buttons"><button id="previous-frame" class="icon-button" aria-label="上一帧">{{ icon('back') }}</button><button id="play-button" class="play-button" aria-label="暂停动画">{{ icon('pause') }}</button><button id="next-frame" class="icon-button" aria-label="下一帧">{{ icon('next') }}</button></div><input id="frame-scrub" type="range" min="0" max="5" value="0" aria-label="当前帧"><label class="fps-label"><select id="fps" aria-label="播放帧率"><option value="4">4 FPS</option><option value="5">5 FPS</option><option value="6">6 FPS</option><option value="8">8 FPS</option><option value="12" selected>12 FPS</option><option value="24">24 FPS</option><option value="30">30 FPS</option></select></label><button id="crop-button" class="button small ghost" hidden>{{ icon('sliders') }} 精确裁剪</button></div>
+              <div class="frames-heading"><span>帧序列 <span id="frame-count" class="muted">06 帧</span></span><select id="group-select" aria-label="选择素材序列" hidden></select><span id="frames-hint" class="muted">点击单帧查看细节</span></div>
+              <div id="frame-list" class="frame-list" aria-label="帧序列"></div>
+            </section>
+            <section id="upload-zone" class="upload-zone" tabindex="0" role="button" aria-label="点击或拖入图片上传"><span class="upload-symbol">{{ icon('upload') }}</span><div><strong>把素材拖到这里，或<span>点击上传</span></strong><p>支持 PNG、JPG、WebP · 最多 12 张 · 总大小 40 MB</p></div><span class="upload-plus">{{ icon('plus') }}</span></section>
+            <div id="upload-list" class="upload-list" aria-live="polite"></div>
+            <p class="storage-note">{{ icon('folder') }} 原图、参数和结果保存在本机 · 长期保留，只有手动删除才会移除。</p>
+          </div>
+          <aside class="panel settings-panel" aria-label="处理参数"><div class="panel-heading"><div class="panel-title"><span class="heading-icon">{{ icon('sliders') }}</span> 处理参数</div><button id="reset-settings" class="text-button">重置</button></div>
+            <form id="settings-form">
+              <p id="cutout-simple-help" class="simple-help" hidden>先自动移除纯色背景，再用预览下方的“手动修补”擦除残留或恢复误删内容。</p>
+              <fieldset id="split-settings"><legend><span class="field-number">01</span> 切割方式</legend><div class="layout-options"><label><input type="radio" name="layout" value="horizontal" checked><span class="layout-icon horizontal"></span><span>横向</span></label><label><input type="radio" name="layout" value="vertical"><span class="layout-icon vertical"></span><span>纵向</span></label><label><input type="radio" name="layout" value="grid"><span class="layout-icon grid"></span><span>网格</span></label></div><div id="strip-fields" class="field"><label for="frames">切割帧数</label><div class="number-control"><button type="button" id="decrease-frames" aria-label="减少帧数">−</button><input id="frames" name="frames" type="number" value="6" min="1" max="128" required><button type="button" id="increase-frames" aria-label="增加帧数">+</button></div></div><div id="grid-fields" class="field-row" hidden><div class="field"><label for="rows">行数</label><input id="rows" name="rows" type="number" value="2" min="1" max="32" required></div><div class="field"><label for="columns">列数</label><input id="columns" name="columns" type="number" value="3" min="1" max="32" required></div></div><p class="field-hint" id="layout-hint">从左到右等分；原图模式可拖动裁剪线。</p></fieldset>
+              <details id="advanced-settings" class="advanced-settings"><summary>高级选项 <span>尺寸、背景与对齐</span></summary>
+              <fieldset id="canvas-settings"><legend><span class="field-number">02</span> 输出画布</legend><div class="field"><label for="size">帧尺寸 <span>透明 PNG</span></label><select id="size" name="size"><option value="0" selected>保留原始尺寸（推荐）</option><option value="128">128 × 128 px</option><option value="256">256 × 256 px</option><option value="512">512 × 512 px</option><option value="1024">1024 × 1024 px</option></select></div><label class="toggle-row"><span>主体自动对齐<small>统一缩放，固定底部中心</small></span><input id="align" name="align" type="checkbox"><span class="toggle"></span></label><div id="alignment-fields" hidden><div class="range-field"><label for="ratio">主体占比 <output id="ratio-value">80%</output></label><input id="ratio" name="ratio" type="range" min="10" max="100" value="80"></div><div class="field"><label for="padding">画布留白 <span>px</span></label><input id="padding" name="padding" type="number" value="16" min="0" max="128" required></div></div><label class="toggle-row compact"><span>裁掉透明边缘</span><input id="trim" name="trim" type="checkbox"><span class="toggle"></span></label></fieldset>
+              <fieldset id="background-settings"><legend><span class="field-number">03</span> 背景处理</legend><label class="toggle-row compact" id="remove-bg-row"><span>移除纯色背景</span><input id="remove-bg" name="remove_bg" type="checkbox"><span class="toggle"></span></label><div id="background-fields" hidden><label class="toggle-row compact"><span>自动识别背景色</span><input id="auto-color" name="auto_color" type="checkbox" checked><span class="toggle"></span></label><div id="color-field" class="field"><label for="color">背景颜色</label><div class="color-input"><input id="color" name="color" type="color" value="#33ff00"><span id="color-value">#33FF00</span><button id="pick-color" type="button" class="text-button">从原图取色</button></div></div><div class="range-field"><label for="tolerance">颜色容差 <output id="tolerance-value">18</output></label><input id="tolerance" name="tolerance" type="range" min="0" max="100" value="18"></div><div class="range-field"><label for="feather">边缘柔化 <output id="feather-value">8</output></label><input id="feather" name="feather" type="range" min="0" max="40" value="8"></div><p class="field-hint">适合绿幕、白底等纯色素材。复杂照片暂不支持自动抠图。</p></div></fieldset>
+              </details>
+              <fieldset><legend><span class="field-number" id="filename-number">04</span> 文件命名</legend><div class="field"><label for="prefix">名称开头</label><input id="prefix" name="prefix" type="text" value="frame" maxlength="48" pattern="(?:[A-Za-z0-9_]|-)+" required spellcheck="false" autocomplete="off"><span class="filename-example" id="filename-example">frame_0001.png</span></div><p id="rename-note" class="field-hint" hidden>上传图片会统一转换为 PNG 并连续编号，原始文件不会被改名。</p></fieldset>
+              <div class="settings-footer"><button id="process-button" type="submit" class="button primary full" disabled>{{ icon('spark') }} <span>开始处理</span>{{ icon('arrow') }}</button><p id="process-hint">先导入素材，或载入示例试试看。</p><div id="processing-progress" class="processing-progress" hidden><span></span></div></div>
+            </form>
+          </aside>
+        </div>
+      </section>
+      <section id="history-view" hidden><div class="history-heading"><div><p>任务长期保存在本机，不会因时间过期。</p><p id="history-storage" role="status">正在读取本地任务…</p></div><div class="history-controls"><label>查看范围<select id="history-scope" aria-label="任务查看范围"><option value="tab">当前工作区</option><option value="all">此浏览器的所有工作区</option></select></label><button id="refresh-history" class="button secondary small">刷新列表</button></div></div><div class="history-selection"><label><input id="history-select-all" type="checkbox"> 全选（最多 128 项）</label><span id="history-selected">选择任务后可批量删除</span><button id="delete-history-selected" class="button secondary small" disabled>删除选中</button></div><p id="history-error" class="field-hint" role="alert" hidden></p><div id="history-list"></div></section>
+      <footer class="main-footer"><span><strong>帧的么 FrameMe</strong><span>·</span>为下一次创作，准备好每一帧。</span><span>素材在本机处理<span>·</span>自由创作，轻装出发</span></footer>
+    </main>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<dialog id="delete-history-dialog" aria-labelledby="delete-history-title"><div class="dialog-heading"><div><span class="eyebrow">管理本机任务</span><h2 id="delete-history-title">删除这些任务？</h2></div></div><p id="delete-history-summary"></p><div class="dialog-actions"><button id="delete-history-cancel" class="button secondary" type="button">取消</button><button id="delete-history-confirm" class="button danger" type="button">永久删除</button></div></dialog>
+<dialog id="retouch-dialog" aria-labelledby="retouch-title">
+  <div class="dialog-heading"><div><span class="eyebrow">FRAMEME / 背景移除</span><h2 id="retouch-title">用画笔，修到刚刚好。</h2></div><button id="retouch-close" class="icon-button" type="button" aria-label="取消修补">{{ icon('close') }}</button></div>
+  <p class="retouch-description">涂抹多余背景即可擦除；误删了主体，切换“恢复内容”涂回来。仅修改当前图片。</p>
+  <div class="retouch-toolbar">
+    <div class="segmented" aria-label="画笔工具"><button type="button" data-brush="erase" class="selected" aria-pressed="true">擦除背景</button><button type="button" data-brush="restore" aria-pressed="false">恢复内容</button><button type="button" data-brush="pan" aria-pressed="false">移动画布</button></div>
+    <label class="retouch-size">画笔 <input id="retouch-size" type="range" min="1" max="240" value="40" aria-label="画笔直径"><output id="retouch-size-value">40 px</output></label>
+    <div class="retouch-history"><button id="retouch-undo" class="button secondary small" type="button" disabled>撤销</button><button id="retouch-redo" class="button secondary small" type="button" disabled>重做</button><button id="retouch-compare" class="button secondary small" type="button" aria-pressed="false">对比原图</button></div>
+  </div>
+  <div id="retouch-viewport" class="retouch-viewport checker"><div id="retouch-canvas-wrap"><canvas id="retouch-canvas" aria-label="手动修补画布，拖动擦除或恢复背景"></canvas></div><span id="retouch-cursor" aria-hidden="true" hidden></span></div>
+  <div class="retouch-controls"><div><button id="retouch-fit" class="text-button" type="button">适应画布</button><label>缩放 <input id="retouch-zoom" type="range" min="50" max="500" value="100" aria-label="修补画布缩放"><output id="retouch-zoom-value">100%</output></label></div><span id="retouch-status" role="status" aria-live="polite">正在载入图片…</span></div>
+  <div class="dialog-actions"><button id="retouch-cancel" class="button secondary" type="button">取消</button><button id="retouch-save" class="button primary" type="button" disabled>{{ icon('check') }} 保存修补</button></div>
+</dialog>
+<dialog id="crop-dialog"><div class="dialog-heading"><div><span class="eyebrow">PRECISION MATTERS</span><h2>精确调整裁剪线</h2></div><button class="icon-button close-dialog" aria-label="关闭">{{ icon('close') }}</button></div><p id="crop-description"></p><form id="crop-form"><div id="crop-fields" class="crop-fields"></div><div class="dialog-actions"><button id="reset-crops" type="button" class="button secondary">恢复等分</button><button type="submit" class="button primary">应用裁剪线</button></div></form></dialog>
+<dialog id="help-dialog"><div class="dialog-heading"><div><span class="eyebrow">A LITTLE GUIDE</span><h2>从素材到作品，只需三步。</h2></div><button class="icon-button close-dialog" aria-label="关闭">{{ icon('close') }}</button></div><ol class="guide-list"><li><strong>导入你的素材</strong><p>上传动画长条、网格精灵图或单张图片，也可以载入内置示例。一次最多 12 张。</p></li><li><strong>调到刚刚好</strong><p>选择横向、纵向或网格切割，调整帧数和画布。单图的横向、纵向切割支持拖动裁剪线与输入精确坐标。</p></li><li><strong>预览，再带走</strong><p>调整播放速度，查看每一帧。导出序列帧 ZIP、精灵图、GIF 或单帧 PNG。</p></li></ol><div class="guide-note"><strong>素材在你自己的电脑上处理</strong><p>当前为本地版，图片仅发送到本机服务。原图、参数和结果长期保存在本机。最近任务默认只显示当前工作区，也可主动查看此浏览器的其他工作区；删除任务前会再次确认。</p><p>键盘：空格播放 / 暂停，← → 逐帧查看。纯色背景移除会影响素材中相近颜色，建议从较低容差开始。</p></div></dialog>
+</body>
+</html>

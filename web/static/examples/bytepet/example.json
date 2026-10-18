@@ -1,0 +1,148 @@
+{
+  "project": "BytePet",
+  "repository": "https://github.com/Li-Rui-Zhe/BytePet",
+  "commit": "8433f2d754f19df5bbcf0833a9271479d86e3754",
+  "license": "LICENSE.txt",
+  "states": [
+    {
+      "key": "calm",
+      "label": "平静待机",
+      "frames": 6,
+      "fps": 4,
+      "width": 512,
+      "height": 512,
+      "strip": "calm-strip.png",
+      "thumbnail": "calm-thumbnail.png",
+      "source_files": [
+        "public/assets/skins/rick_default/calm/calm_0001.png",
+        "public/assets/skins/rick_default/calm/calm_0002.png",
+        "public/assets/skins/rick_default/calm/calm_0003.png",
+        "public/assets/skins/rick_default/calm/calm_0004.png",
+        "public/assets/skins/rick_default/calm/calm_0005.png",
+        "public/assets/skins/rick_default/calm/calm_0006.png"
+      ],
+      "sha256": [
+        "0f1235b540e17d25fa235ebd3b088c3aafb700757e88c40a039a3f401b517745",
+        "808429fb84d8cac76d84c532f7aba8e4db7b13f034ae5acb96f65cf270dd7481",
+        "65917de5028ab73ca793cc784edf1811af975e2bcde6a8474d3f7bf8ceba1e87",
+        "45c9519da891be4e3e1ecf267ba7de11938eb32450c4578c02ddac4425d7249f",
+        "6981a7c2ec634d7eb9dbfa08f0803330881d04465ca039a22b63502c028e41e9",
+        "4eeba6fb80fabbc8cefbe061b96d36874df8af2bf4d7404f3458e8adc0926625"
+      ],
+      "frame_files": [
+        "frames/calm_0001.png",
+        "frames/calm_0002.png",
+        "frames/calm_0003.png",
+        "frames/calm_0004.png",
+        "frames/calm_0005.png",
+        "frames/calm_0006.png"
+      ]
+    },
+    {
+      "key": "happy",
+      "label": "开心",
+      "frames": 6,
+      "fps": 4,
+      "width": 512,
+      "height": 512,
+      "strip": "curated/happy-v2/happy-strip.png",
+      "thumbnail": "curated/happy-v2/happy-thumbnail.png",
+      "source_files": [
+        "public/assets/skins/rick_default/happy/happy_0001.png",
+        "public/assets/skins/rick_default/happy/happy_0002.png",
+        "public/assets/skins/rick_default/happy/happy_0003.png",
+        "public/assets/skins/rick_default/happy/happy_0004.png",
+        "public/assets/skins/rick_default/happy/happy_0005.png",
+        "public/assets/skins/rick_default/happy/happy_0006.png"
+      ],
+      "sha256": [
+        "9a53f36768bf9eb2b58523bc585b296b6b1cd05189bee731663e45b17b3f7841",
+        "465cbc0414bbc13684483d9fa1444ede0316613bc20d8c9782b01119aba8caca",
+        "572269273611fe4c09d7aafee4cfe0dd33d99296f01b9939a47c92b611319230",
+        "e5b35e6eadfe219c008bf72c7df42d61133b5be3ba176fa860e863988def758c",
+        "a8f395e1db9342a31f98116c886421fa974b3ac45b50e721023bead11146dbc0",
+        "43227ad6a1c6c7a553e22ceb2a85afcc307bf1643f58783f3aa8a8d9eb9eb600"
+      ],
+      "frame_files": [
+        "curated/happy-v2/happy_0001.png",
+        "curated/happy-v2/happy_0002.png",
+        "curated/happy-v2/happy_0003.png",
+        "curated/happy-v2/happy_0004.png",
+        "curated/happy-v2/happy_0005.png",
+        "curated/happy-v2/happy_0006.png"
+      ],
+      "original_frame_files": [
+        "frames/happy_0001.png",
+        "frames/happy_0002.png",
+        "frames/happy_0003.png",
+        "frames/happy_0004.png",
+        "frames/happy_0005.png",
+        "frames/happy_0006.png"
+      ],
+      "original_strip": "happy-strip.png",
+      "original_thumbnail": "happy-thumbnail.png",
+      "source_kind": "repaired",
+      "derived_sha256": [
+        "6d07d2f85839b7a930f50a05272e7f9cfe5899e305ea090d9c895c89b6ad125f",
+        "bfd2ef8527dad08dad337f099da88a6ace8ecc209916d505b78f2426f9093647",
+        "70dcd28a387726cf46bafd3a3f35c7dce07e26c043284756e4914d8cec87c47e",
+        "4157561397737866cb2fb781b31b5ae518c04dae298deeb8637f4e60923de00f",
+        "ae80072d1121284bc9920fdb238967541f68ce62b6283f58bb627f32c38da303",
+        "de37d2717fdaf7a1a6a44d6dfc9b8b5cef8ed9523dcc2635c39936e77e8c64d3"
+      ],
+      "source_note": "基于 BytePet 开心动作的 AI 修补与重绘演示：补全天线顶端、整理轮廓与安全留白；原始素材另行保留。"
+    },
+    {
+      "key": "run_right",
+      "label": "向右跑",
+      "frames": 4,
+      "fps": 5,
+      "width": 512,
+      "height": 512,
+      "strip": "run_right-strip.png",
+      "thumbnail": "run_right-thumbnail.png",
+      "source_files": [
+        "public/assets/skins/rick_default/run_right/run_right_0001.png",
+        "public/assets/skins/rick_default/run_right/run_right_0002.png",
+        "public/assets/skins/rick_default/run_right/run_right_0003.png",
+        "public/assets/skins/rick_default/run_right/run_right_0004.png"
+      ],
+      "sha256": [
+        "47899d4912af2494e853c52a70997aa3268a3d9b250be4e611d4e67fdfe09d82",
+        "14155792a66ba7b7ce596e60a842cda365b0a4ff7ad5ba9cf013c7a845e40114",
+        "49f983f2951f3498212fefcabb6e7ef3170a111fc9c70b46b87ba5a783d12198",
+        "aee199daffd71628208e7f02d56675d5fc2cc59d2a2a3a8690cda9cd5f4d8c89"
+      ],
+      "frame_files": [
+        "frames/run_right_0001.png",
+        "frames/run_right_0002.png",
+        "frames/run_right_0003.png",
+        "frames/run_right_0004.png"
+      ]
+    }
+  ],
+  "cutout_states": [
+    {
+      "key": "star",
+      "label": "星球图标 · 绿幕原图",
+      "file": "originals/star_uploaded_input.png",
+      "source": "assets/skins/rick_default/_generated_strips/star_uploaded_input.png",
+      "sha256": "97c2453d8b84eb0de070ebef0e9c7cfe7aa826b5d4a897c6df46e3a06d04a381",
+      "width": 1254,
+      "height": 1254,
+      "tolerance": 18,
+      "feather": 8
+    },
+    {
+      "key": "comfort",
+      "label": "人物立绘 · 绿幕原图",
+      "file": "originals/comfort_0001_uploaded_input.png",
+      "source": "assets/skins/rick_default/_generated_strips/comfort_0001_uploaded_input.png",
+      "sha256": "0a476294b59c12958145dcbc231d46f174428882189a7a8ef158f0496ed3be11",
+      "width": 1254,
+      "height": 1254,
+      "tolerance": 18,
+      "feather": 8
+    }
+  ]
+}

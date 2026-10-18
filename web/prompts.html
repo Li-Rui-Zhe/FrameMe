@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="复用作者的 Q 版、写实与娜塔莎动作帧 Prompt：一键复制，生成素材后用帧的么去背景、切帧，导出 GIF 或 PNG 序列。">
+  <meta name="color-scheme" content="light dark"><meta name="framelab-workspace-scope" content="{{ workspace_scope }}">
+  <title>Prompt 示例与指南 — 帧的么 FrameMe</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/app.css"><link rel="stylesheet" href="/static/about.css"><link rel="stylesheet" href="/static/prompts.css">
+  <script src="/static/draft-store.js" defer></script><script src="/static/about.js" defer></script><script src="/static/prompts.js" defer></script>
+</head>
+<body data-page="prompts">
+{% from 'icons.html' import icon %}{% include 'icons.html' %}
+<div class="app-shell">
+  {% set about_page = true %}{% set prompt_page = true %}{% include 'sidebar.html' %}
+  <div class="main-shell">
+    <header class="topbar"><div class="breadcrumb"><span class="breadcrumb-brand">帧的么工作台</span><span>/</span><strong>Prompt 示例</strong></div><div class="top-actions"><button id="theme-button" class="icon-button" aria-label="切换深色主题">{{ icon('moon') }}</button><a class="button secondary small" href="/editor">进入工作台 {{ icon('arrow') }}</a></div></header>
+    <main class="about-main prompt-main">
+      <section class="prompt-intro"><div class="eyebrow">PROMPT TO FRAMES / 从描述到动画</div><h1>一张图，<span>连成一个完整动作。</span></h1><p>默认生成一张包含 6 帧连续动作的长条图。回来切成 6 张，就能制作 GIF 和透明 PNG。</p></section>
+      <section id="prompt-guide" class="panel prompt-quick-guide" aria-labelledby="prompt-guide-title">
+        <div class="prompt-guide-heading"><h2 id="prompt-guide-title">使用指南 · 三步开始</h2><span>先准备一张角色参考图</span></div>
+        <ol class="prompt-quick-steps"><li><b>1</b><div><strong>选示例，复制 Prompt</strong><p>直接用默认内容，换角色再点详情修改。</p></div></li><li><b>2</b><div><strong>附上参考图，去生图</strong><p><span id="prompt-generation-hint">一次生成 1 张图，里面包含 6 帧连续动作。</span></p></div></li><li><b>3</b><div><strong>回工作台，处理下载</strong><p id="prompt-processing-hint">把长条切成 6 张，去底后导出 GIF 或 PNG。</p></div></li></ol>
+        <details id="prompt-guide-details" class="prompt-disclosure"><summary>查看完整指南与注意事项</summary>
+        <div class="prompt-frame-explanation"><h3>先看懂：生成的是 1 张长条，切开后才是 6 张。</h3><p>Prompt 描述同一角色的六个连续动作瞬间，让生图工具按顺序画在同一张图里。它不是六个不同角色，也不是一段视频；切帧后按顺序播放，才组成一个完整动作。</p>{% include 'frame-flow.html' %}<p>目标为 3072×512，一张图横向等分六格，每格 512×512。FrameMe 负责切帧、去底和动画导出，生图在你使用的工具里完成。</p></div><ol class="prompt-guide-steps">
+          <li class="panel"><b>01</b><div><h3>准备角色图，复制完整 Prompt</h3><p>先选 Q 版、写实或娜塔莎案例。换角色时修改外观、动作和六帧节奏，并在生图工具中上传同一张角色参考图。Prompt 本身不包含参考图片。</p></div></li>
+          <li class="panel"><b>02</b><div><h3>交给生图工具，检查输出</h3><p>帧的么负责处理素材，生图需在你自己的生图工具完成，其能力与费用以该工具为准。保存原尺寸文件，避免用截图代替。检查是否正好六帧、人物完整、背景纯色、没有文字与分隔线。</p><p>长条目标为 3072 × 512，每帧 512 × 512；模型不一定遵守尺寸，实际图片只要六格等宽也可切。若不能一次生成六张独立图片，用同一参考图逐帧生成，或改选长条模板。</p></div></li>
+          <li class="panel"><b>03</b><div><h3>回帧的么，切帧与免费去背景</h3><p><strong>一张长条：</strong>点击上方处理按钮，上传图片后自动应用横向六帧、#33ff00 去底、512 px 画布与 4 FPS。检查切线后点“生成动画帧”。如果有背景残留，可调整容差；需要画笔修补时，将原图放到“背景移除”先修补、下载 PNG，再回切帧。</p><p><strong>六张独立图片：</strong>选择独立图片模式后点击处理按钮，在“背景移除”上传六张图，逐张检查并按需手动修补。下载 ZIP，解压得到透明 PNG。</p><p>自动去底适合纯色背景。角色有绿色时，应在 Prompt 与工作台中改用另一种不会与角色重叠的纯色；恢复画笔可以找回误删的主体。</p></div></li>
+          <li class="panel"><b>04</b><div><h3>选格式下载，把素材用起来</h3><p><strong>做 GIF 表情包：</strong>从长条切帧后选择 GIF，预览速度就是导出速度。<strong>做 PNG 逐帧：</strong>选择 PNG 图片 ZIP，保留透明细节；需要连续命名时，将解压后的 PNG 上传到“批量命名”，设置动作前缀。</p><p>六张独立图当前不会在批量命名中合成 GIF；要在帧的么做 GIF，请选长条模式重新生成。不同工具分别保存素材，切换工具后需上传要继续处理的 PNG。</p></div></li>
+        </ol>
+        </details>
+      </section>
+      <section class="prompt-builder panel" aria-labelledby="prompt-builder-title">
+        <div class="panel-heading"><div><h2 id="prompt-builder-title">从一个示例开始</h2><p>内容已填好，可以直接复制；换自己的角色时，同时上传角色参考图。</p></div><span class="prompt-badge">作者自用 · 整理复用</span></div>
+        <div class="prompt-template-grid" aria-label="选择 Prompt 示例">
+          <button type="button" class="prompt-template selected" data-template="chibi" aria-pressed="true"><b>Q 版角色</b><span>圆润比例 · 轻微 3D 光泽</span><small>六帧长条 / 默认</small></button>
+          <button type="button" class="prompt-template" data-template="realistic" aria-pressed="false"><b>写实 / 国风角色</b><span>清冷剑修 · 稳定服饰与道具</span><small>六帧长条 / 默认</small></button>
+          <button type="button" class="prompt-template" data-template="natasha" aria-pressed="false"><b>娜塔莎 · 打哈欠</b><span>作者具体案例 · 完整动作节奏</span><small>六帧长条 / 默认</small></button>
+        </div>
+        <div class="prompt-quick-actions">
+          <div class="prompt-selection"><h3 id="prompt-current-name">Q 版角色</h3><span id="prompt-current-format" class="prompt-badge">六帧长条</span><p id="prompt-short-description"></p></div>
+          <div class="prompt-copy-actions"><button id="copy-prompt" type="button" class="button primary" disabled>{{ icon('copy') }} 复制完整 Prompt</button><a id="prompt-process-link" class="button secondary" href="/editor?tool=split&amp;format=gif&amp;recipe=strip">已有图片，去处理 {{ icon('arrow') }}</a></div>
+          <p id="copy-status" role="status" aria-live="polite">复制后，请在生图工具中附上角色参考图。</p>
+        </div>
+        <details id="prompt-details" class="prompt-disclosure"><summary>查看 Prompt 详情与编辑 <span>角色外观、动作节奏、输出形式</span></summary>
+        <div class="prompt-editor-grid">
+          <form id="prompt-form" class="prompt-fields">
+            <div class="field"><label for="prompt-layout">生成什么样的图片？</label><select id="prompt-layout"><option value="strip">一张六帧横向长条（适合 GIF）</option><option value="images">六张独立图片（适合 PNG 序列）</option></select></div>
+            <div class="field"><label for="prompt-character">角色外观</label><textarea id="prompt-character" rows="6" maxlength="5000"></textarea></div>
+            <div class="field"><label for="prompt-action">动作主题</label><input id="prompt-action" maxlength="200"></div>
+            <div class="field"><label for="prompt-motion">六帧动作节奏 <span>可直接使用</span></label><textarea id="prompt-motion" rows="5" maxlength="3000"></textarea></div>
+            <div class="field"><label for="prompt-props">道具与额外要求 <span>选填</span></label><textarea id="prompt-props" rows="3" maxlength="2000"></textarea></div>
+            <p class="field-hint" id="prompt-source"></p><button class="text-button" type="button" id="reset-prompt">恢复当前示例</button>
+          </form>
+          <div class="prompt-preview"><div class="prompt-preview-heading"><h3>可以直接复制的完整 Prompt</h3><span id="prompt-count"></span></div><textarea id="prompt-output" readonly aria-label="完整 Prompt" spellcheck="false"></textarea><div class="prompt-copy-actions"><button id="select-prompt" type="button" class="button secondary">选中全文</button></div><p class="field-hint" id="prompt-process-hint"></p></div>
+        </div>
+        </details>
+      </section>
+      <section class="panel prompt-projects" aria-labelledby="prompt-project-title"><div class="about-section-heading"><div><span class="about-kicker">OPEN SOURCE / 完整创作链路</span><h2 id="prompt-project-title">从素材处理，到真正用进项目。</h2></div></div><div class="prompt-project-grid"><article><span class="prompt-badge">素材工具</span><h3>帧的么 FrameMe</h3><p>当前工作台的开源项目。负责切帧、免费纯色去底、手动修补、命名和 GIF / PNG 导出。</p><a href="https://github.com/Li-Rui-Zhe/FrameMe" target="_blank" rel="noopener noreferrer">查看帧的么源码 {{ icon('arrow') }}</a></article><article><span class="prompt-badge">应用实例</span><h3>BytePet</h3><p>作者的开源桌宠项目，支持 PNG 序列帧角色资源。内置示例来自它的原始素材，你也可以把做好的动作帧继续用于自己的角色。</p><a href="https://github.com/Li-Rui-Zhe/BytePet#自定义角色资源包" target="_blank" rel="noopener noreferrer">查看 BytePet 与资源包说明 {{ icon('arrow') }}</a></article></div><details><summary>用于 BytePet 时，还要准备什么？</summary><p>先按 BytePet 当前 README 的资源包要求准备动作目录。以打哈欠为例，将透明 PNG 按顺序命名为 yawn_0001.png…yawn_0006.png，放入 yawn/；其余动作也需要按资源包要求补齐。一个动作的 ZIP 不是完整角色包，不能直接当成完整皮肤导入。</p><pre>角色资源包/
+  yawn/
+    yawn_0001.png
+    …
+    yawn_0006.png
+  calm/
+    …（其余动作按项目说明准备）</pre><p>完成资源包后，在 BytePet 中导入并检查动作。这里只提供素材制作与项目接入指南，不会自动安装或修改你的 BytePet。</p></details><a class="button secondary small" href="/editor?tool=split&amp;demo=1">先用真实 BytePet 素材跑一遍 {{ icon('arrow') }}</a></section>
+      <section class="about-faq"><details><summary>为什么角色会漂移、画成五格，或背景不够干净？</summary><p>Prompt 能帮助约束输出，但无法保证模型严格执行。先减少动作幅度、固定同一参考图与外观描述；缺帧或角色变样需要重新生成。轻微边缘残留可调整容差、手动修补；尺寸不一致可在工作台统一画布与对齐。选择 GIF 时，半透明边缘会变成全透明或不透明。</p></details><details><summary>这些示例从哪里来？</summary><p>整理自作者的《动作帧模板q版》《动作帧模板写实》和《娜塔莎具体动作帧prompt》。保留角色一致性、六帧、全身、底部锚点、#33ff00 绿幕与干净边缘等约束，补充连续动作节奏与工作台使用说明；长条与独立图可按用途切换。原始笔记未被修改。</p></details></section>
+      <footer class="main-footer"><span><strong>帧的么 FrameMe</strong><span>·</span>从一句描述，到一组可用的素材。</span><span>复制 · 生成 · 处理 · 创作</span></footer>
+    </main>
+  </div>
+</div><div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body></html>

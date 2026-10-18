@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="帧的么 FrameMe：制作 GIF 表情包、免费去除纯色背景、导出透明 PNG 逐帧动画素材。支持手动擦除修补、动画预览与批量命名。">
+  <meta name="color-scheme" content="light dark">
+  <meta name="framelab-workspace-scope" content="{{ workspace_scope }}">
+  <title>项目介绍 — 帧的么 FrameMe</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/about.css">
+  <script src="/static/draft-store.js" defer></script>
+  <script src="/static/about.js" defer></script>
+</head>
+<body data-page="about">
+{% from 'icons.html' import icon %}{% include 'icons.html' %}
+<div class="app-shell">
+  {% set about_page = true %}{% include 'sidebar.html' %}
+  <div class="main-shell">
+    <header class="topbar"><div class="breadcrumb"><span class="breadcrumb-brand">帧的么工作台</span><span>/</span><strong>项目介绍</strong></div><div class="top-actions"><button id="theme-button" class="icon-button" aria-label="切换深色主题">{{ icon('moon') }}</button><a class="button secondary small" href="/editor">进入工作台 {{ icon('arrow') }}</a></div></header>
+    <main class="about-main">
+      <section class="about-hero panel" aria-labelledby="about-title">
+        <div class="about-hero-copy"><div class="eyebrow"><span></span> FRAMEME / 让图片动起来</div><h1 id="about-title">一张图，<br><span>连成一个完整动作。</span></h1><p>用 Prompt 让生图工具把 6 个连续动作画在同一张长条图里，再交给帧的么切成 6 张、免费去除纯色背景，导出 GIF 表情包或透明 PNG 序列。一个动作，从一张图开始。</p><div class="about-tags"><span>{{ icon('check') }} 免费切帧与纯色去底</span><span>{{ icon('check') }} 原图保持完整</span><span>{{ icon('check') }} GIF / PNG 直接下载</span></div><a href="/editor" class="button primary">打开工作台 {{ icon('arrow') }}</a><p class="about-prompt-link"><a href="/prompts">没有动作素材？先复制六帧 Prompt →</a></p></div>
+        <div class="about-hero-art" aria-label="使用 BytePet 原始素材展示从序列帧到动画的过程"><span class="about-art-caption">BytePet 原始素材 · 真实 GIF 循环演示</span><div class="about-frame-stack"><div class="about-art-sheet back"></div><div class="about-art-sheet front checker"><img src="/static/examples/bytepet/calm-preview.gif" alt="由 BytePet 六张原始 PNG 帧制作的循环 GIF 表情动画"><span>GIF / 4 FPS / LOOP</span></div><span class="about-art-spark">{{ icon('spark') }}</span></div><div class="about-mini-strip checker">{% for i in range(1, 5) %}<img src="/static/examples/bytepet/frames/calm_{{ '%04d'|format(i) }}.png" alt="" loading="lazy">{% endfor %}</div><a href="https://github.com/Li-Rui-Zhe/BytePet" target="_blank" rel="noopener noreferrer" class="about-source">示例素材来自 BytePet {{ icon('arrow') }}</a></div>
+      </section>
+
+      <section id="about-frame-flow" class="about-flow panel" aria-labelledby="about-frame-flow-title">
+        <span class="about-kicker">HOW IT WORKS / 一张图，为什么能动？</span><h2 id="about-frame-flow-title">1 张长条图 → 6 张动作帧 → 1 个循环动画</h2>
+        <p class="about-flow-lead">这里的“一张图”是<strong>一张包含 6 帧连续动作的图片</strong>。例如打哈欠：准备、张嘴、张大、停顿、闭嘴、恢复。Prompt 会让生图工具把这六个瞬间从左到右画在同一张图里；帧的么再沿等宽区域切开，按顺序播放。</p>
+        {% include 'frame-flow.html' %}
+        <div class="about-flow-links"><a class="button primary small" href="/prompts">复制六帧 Prompt {{ icon('copy') }}</a><a class="button secondary small" href="/editor?tool=split&amp;demo=1">用真实示例跑一遍 {{ icon('play') }}</a></div>
+        <p class="about-flow-note">先把角色参考图与 Prompt 交给你使用的生图工具，保存生成的六帧长条，再上传到 FrameMe。已有长条或网格素材也可直接处理。生图工具的能力与费用以其自身为准。</p>
+      </section>
+
+      <section aria-labelledby="about-tools-title"><div class="about-section-heading"><div><span class="about-kicker">01 / 三种创作方式</span><h2 id="about-tools-title">表情包、透明图、逐帧动画，一站准备。</h2></div><p>选一个用途，直接进入对应工具。</p></div><div class="about-tool-grid">
+        <article class="panel about-tool" data-feature="split"><span class="about-feature-icon">{{ icon('play') }}</span><span class="about-format-tag">01 / GIF</span><h3>做会动的 GIF 表情包</h3><p>把长条或网格序列图切成多帧，预览动作，再下载循环播放的 GIF。</p><ul><li>序列帧切割：横向、纵向、网格</li><li>调整播放速度，逐帧检查动作</li><li>自带真实示例，没素材也能试</li></ul><a href="/editor?tool=split&amp;format=gif">开始做 GIF {{ icon('arrow') }}</a></article>
+        <article class="panel about-tool" data-feature="cutout"><span class="about-feature-icon">{{ icon('cut') }}</span><span class="about-format-tag">02 / 透明背景</span><h3>免费去背景，留下主角</h3><p>绿幕、白底等纯色背景自动去除；不满意的地方，再用画笔手动擦干净。</p><ul><li>调整背景颜色、容差与边缘</li><li>手动擦除与恢复，支持撤销重做</li><li>下载透明 PNG，继续创作</li></ul><a href="/editor?tool=cutout&amp;format=png">免费去除背景 {{ icon('arrow') }}</a></article>
+        <article class="panel about-tool" data-feature="frames"><span class="about-feature-icon">{{ icon('split') }}</span><span class="about-format-tag">03 / PNG 序列</span><h3>准备 PNG 逐帧动画</h3><p>把每一帧保留为独立 PNG，透明背景与图片细节都能留下，用于游戏、贴纸和动效。</p><ul><li>统一画布大小与主体位置</li><li>按顺序编号，整组打包下载</li><li>也能导出精灵图，一张图收齐</li></ul><a href="/editor?tool=split&amp;format=zip">制作 PNG 序列 {{ icon('arrow') }}</a></article>
+      </div></section>
+
+      <div class="about-organize panel" data-feature="rename"><div><strong>素材多了？顺手整理好。</strong><p>批量命名支持统一前缀、连续编号与 PNG 转换，原始文件不改名。</p></div><a class="button secondary small" href="/editor?tool=rename">批量命名 {{ icon('arrow') }}</a></div>
+
+      <section class="about-capabilities panel" aria-label="预览、导出与保存功能"><div><span class="about-small-icon">{{ icon('play') }}</span><h3>先预览，再决定</h3><p>播放动画、逐帧查看，调整 4–30 FPS；切换透明、白色、深色背景检查边缘。</p></div><div><span class="about-small-icon">{{ icon('download') }}</span><h3>按用途带走素材</h3><p>下载单张 PNG、全部素材 ZIP、分组目录、精灵图或循环 GIF。</p></div><div><span class="about-small-icon">{{ icon('history') }}</span><h3>留住这次进度</h3><p>刷新后继续编辑，通过最近任务找回结果；不同工具与标签页分别保存。</p></div></section>
+
+      <section id="about-how" aria-labelledby="about-how-title"><div class="about-section-heading"><div><span class="about-kicker">02 / 使用流程</span><h2 id="about-how-title">从素材到结果，只需三步。</h2></div></div><ol class="about-steps"><li><b>1</b><div><h3>选工具，导入图片</h3><p>有六帧长条就直接上传。没有动作素材，先到 Prompt 示例页复制模板，附上角色参考图生图；也能一键试用内置案例。</p></div></li><li><b>2</b><div><h3>处理，再修整一下</h3><p>先用默认参数生成。需要时调整裁剪、画布、背景或命名，去底后可手动画笔修补。</p></div></li><li><b>3</b><div><h3>预览，下载使用</h3><p>选 GIF 动图、PNG 逐帧图片或透明 PNG，点击下载即可，不用再找导出入口。</p></div></li></ol></section>
+
+      <section class="about-faq" aria-labelledby="about-faq-title"><div class="about-section-heading"><div><span class="about-kicker">03 / 开始之前</span><h2 id="about-faq-title">你可能还想知道。</h2></div></div><details><summary>只有一张普通角色立绘，可以直接让它动起来吗？</summary><p>先把角色立绘作为参考图，和六帧 Prompt 一起交给生图工具，生成一张包含六个连续动作的长条图，再上传到帧的么切帧与导出。FrameMe 负责素材处理；动作画面由你使用的生图工具生成，不会从单张静态立绘自动补出动作。</p></details><details><summary>为什么默认是一张图，而不是六张图？</summary><p>默认模板要求同一张图里从左到右排列六帧，有助于统一角色外观、画面比例和动作顺序，也方便一次上传、等分切帧。目标为 3072×512，每帧 512×512。生成后仍需检查帧数、构图和角色一致性；模型输出不一定严格满足要求。需要独立图片时，可在 Prompt 详情里切换输出形式。</p></details><details><summary>什么样的素材适合使用帧的么？</summary><p>动画长条、网格精灵图、绿幕或白底插画，以及需要统一命名的图片。一次最多 12 张、总大小 40 MB；单次输入和输出各不超过 2400 万像素。</p></details><details><summary>GIF 表情包和 PNG 逐帧有什么区别？</summary><p>GIF 是可以直接循环播放的动画文件，适合分享表情和预览动作；PNG 逐帧是独立图片组成的序列，以 ZIP 打包，适合导入游戏或动画工具。GIF 只支持全透明或不透明，半透明细节建议用 PNG 保留。批量命名仅整理图片，不会把多张独立图片合成 GIF。</p></details><details><summary>复杂照片可以自动去背景吗？</summary><p>自动去底针对纯色背景，不是 AI 场景分割。残留部分可以用手动画笔擦除；误删的内容可以切换恢复画笔涂回来。</p></details><details><summary>原图和进度会保存多久？</summary><p>图片在本机服务中处理，工作区自动暂存。原图、参数与处理结果长期保存在本机，不会自动过期。最近任务支持查看占用空间和手动删除；关闭的工作区可从“此浏览器的所有工作区”找回结果。请保留浏览器身份数据，更换浏览器或清除 Cookie 不会自动认领旧数据；原始文件不会被覆盖。</p></details></section>
+      <footer class="main-footer"><span><strong>帧的么 FrameMe</strong><span>·</span>为下一次创作，准备好每一帧。</span><span>素材在本机处理<span>·</span>自由创作，轻装出发</span></footer>
+    </main>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

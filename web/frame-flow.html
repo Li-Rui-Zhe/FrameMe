@@ -1,0 +1,5 @@
+<div class="frame-flow" aria-label="一张六帧长条图切成六张动作图片，再按顺序播放成动画">
+  <article><span class="frame-flow-step">01 / 一张图</span><h3>把 6 帧画在同一张长条里</h3><div class="frame-flow-strip checker"><img src="/static/examples/bytepet/curated/happy-v2/happy-strip.png" alt="一张完整长条图片，从左到右包含同一角色的六个连续动作" loading="lazy"></div><p>文件只有 <strong>1 张</strong>，里面是动作的 6 个连续瞬间。</p></article>
+  <article><span class="frame-flow-step">02 / 六张帧</span><h3>沿着等宽区域切成 6 张 PNG</h3><div class="frame-flow-frames">{% for i in range(1, 7) %}<figure><img class="checker" src="/static/examples/bytepet/curated/happy-v2/happy_{{ '%04d'|format(i) }}.png" alt="第 {{ i }} 帧独立动作图片" loading="lazy"><figcaption>{{ '%02d'|format(i) }}</figcaption></figure>{% endfor %}</div><p>每张图片保留一个动作瞬间，可以去底、统一尺寸。</p></article>
+  <article><span class="frame-flow-step">03 / 一个动作</span><h3>按顺序播放，角色就动起来</h3><div class="frame-flow-animation checker"><img src="/static/examples/bytepet/curated/happy-v2/happy-preview.gif" alt="前述六张 PNG 按顺序播放组成的开心动作 GIF" loading="lazy"><span>01 → 02 → 03 → 04 → 05 → 06 ↻</span></div><p>下载 <strong>GIF 表情包</strong>，或打包带走 <strong>PNG 逐帧素材</strong>。</p></article>
+</div>
