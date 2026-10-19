@@ -67,7 +67,7 @@ class PipelineTests(unittest.TestCase):
         transparent = Image.new("RGBA", (1, 1))
         self.assertEqual(remove_color(transparent, self.options()).getpixel((0, 0)), (0, 0, 0, 0))
 
-    def test_alignment_uses_one_scale_and_shared_baseline(self):
+    def test_alignment_uses_one_scale_and_centres_each_subject(self):
         images = []
         for height in [30, 15]:
             image = Image.new("RGBA", (50, 50))
@@ -75,9 +75,41 @@ class PipelineTests(unittest.TestCase):
             images.append(image)
         frames = fit_frames(images, self.options(size=100, padding=10, ratio=80, align=True))
         boxes = [frame.getchannel("A").getbbox() for frame in frames]
-        self.assertEqual(boxes[0][3], boxes[1][3])
+        for box in boxes:
+            self.assertAlmostEqual((box[0] + box[2]) / 2, 50, delta=1)
+            self.assertAlmostEqual((box[1] + box[3]) / 2, 50, delta=1)
         self.assertAlmostEqual((boxes[0][3] - boxes[0][1]) / (boxes[1][3] - boxes[1][1]), 2, delta=.15)
         self.assertEqual(frames[0].size, (100, 100))
+
+    def test_original_canvas_alignment_moves_without_scaling(self):
+        image = Image.new("RGBA", (80, 60))
+        ImageDraw.Draw(image).rectangle((2, 5, 11, 24), fill="red")
+        output = fit_frames([image], self.options(size=0, align=True))[0]
+        self.assertEqual(output.size, image.size)
+        self.assertEqual(output.getchannel("A").getbbox(), (35, 20, 45, 40))
+        self.assertEqual(output.getpixel((35, 20)), (255, 0, 0, 255))
+
+    def test_key_colour_inside_subject_survives_high_tolerance(self):
+        image = Image.new("RGBA", (40, 40), "#00ff00")
+        draw = ImageDraw.Draw(image)
+        draw.rectangle((8, 8, 31, 31), fill="red")
+        draw.rectangle((14, 14, 25, 25), fill="#00ff00")
+        result = remove_color(image, self.options(auto_color=False, color="#00ff00", tolerance=100))
+        self.assertEqual(result.getpixel((0, 0))[3], 0)
+        self.assertEqual(result.getpixel((20, 20)), image.getpixel((20, 20)))
+        self.assertEqual(result.getpixel((10, 10)), image.getpixel((10, 10)))
+
+    def test_edge_unmix_removes_green_fringe_without_eroding_opaque_subject(self):
+        image = Image.new("RGBA", (30, 30), "#00ff00")
+        draw = ImageDraw.Draw(image)
+        draw.rectangle((8, 8, 21, 21), fill=(128, 127, 0, 255))
+        draw.rectangle((9, 9, 20, 20), fill="red")
+        result = remove_color(image, self.options(auto_color=False, color="#00ff00", tolerance=18, feather=8))
+        edge = result.getpixel((8, 15))
+        self.assertTrue(100 < edge[3] < 160)
+        self.assertLessEqual(edge[1], 2)
+        self.assertGreaterEqual(edge[0], 250)
+        self.assertEqual(result.getpixel((15, 15)), (255, 0, 0, 255))
 
     def test_empty_frame_and_original_size(self):
         image = Image.new("RGBA", (7, 9))
@@ -153,6 +185,25 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(gif.info["loop"], 0)
         self.assertEqual(gif.info["duration"], 100)
         self.assertEqual(gif.convert("RGBA").getpixel((0, 0))[3], 0)
+
+    def test_cutout_preserves_dimensions_and_pixels_despite_old_resize_settings(self):
+        image = Image.new("RGBA", (143, 37), (0, 255, 0, 255))
+        image.putpixel((71, 18), (255, 0, 0, 128))
+        job = self.process(image, {"mode": "cutout", "size": 512, "align": True, "trim": True,
+                                   "auto_color": False, "color": "#00ff00", "tolerance": 0, "feather": 0}).json
+        output = Image.open(io.BytesIO(self.get(job["groups"][0]["frames"][0]["url"]).data))
+        self.assertEqual(output.size, image.size)
+        self.assertEqual(output.getpixel((71, 18)), image.getpixel((71, 18)))
+        self.assertEqual(output.getpixel((0, 0))[3], 0)
+
+    def test_cutout_batch_zip_contains_only_original_size_pngs(self):
+        images = [(Image.new("RGBA", size, "green"), name) for size, name in [((143, 37), "wide.png"), ((29, 81), "tall.png")]]
+        response = self.process(options={"mode": "cutout", "size": 512}, multiple=images)
+        self.assertEqual(response.status_code, 201)
+        with zipfile.ZipFile(io.BytesIO(self.get(response.json["zip_url"]).data)) as archive:
+            self.assertEqual(len(archive.namelist()), 2)
+            self.assertTrue(all(name.endswith(".png") for name in archive.namelist()))
+            self.assertEqual([Image.open(io.BytesIO(archive.read(name))).size for name in archive.namelist()], [(143, 37), (29, 81)])
 
     def test_batch_files_have_unique_names_and_rename_is_sequential(self):
         first = Image.new("RGBA", (6, 3), "red")

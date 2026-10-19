@@ -128,14 +128,15 @@ class ToolExampleTests(unittest.TestCase):
         self.assertEqual(counts, sorted(counts))
         self.assertGreater(counts[-1], counts[0])
 
-    def test_feather_produces_partial_alpha_without_changing_rgb(self):
+    def test_feather_produces_partial_alpha_and_decontaminates_rgb(self):
         image = Image.new("RGBA", (3, 1), (0, 255, 0, 255))
         image.putpixel((1, 0), (5, 255, 0, 255))
         image.putpixel((2, 0), (255, 0, 0, 255))
         options = server.validate_options({"auto_color": False, "color": "#00ff00", "tolerance": 0, "feather": 10})
         result = remove_color(image, options)
         self.assertTrue(0 < result.getpixel((1, 0))[3] < 255)
-        self.assertEqual(result.getpixel((1, 0))[:3], image.getpixel((1, 0))[:3])
+        # Edge colours are now unmixed; the opaque foreground remains exact.
+        self.assertEqual(result.getpixel((2, 0))[:3], image.getpixel((2, 0))[:3])
         self.assertEqual(result.getpixel((2, 0))[3], 255)
 
     def test_rename_six_original_frames_preserves_every_pixel(self):
@@ -210,7 +211,12 @@ class ToolExampleTests(unittest.TestCase):
     def test_prefix_validation_and_empty_result_warning(self):
         for prefix in ["", "../escape", "a/b", "中文", "a" * 49]:
             self.assertEqual(self.post(self.originals()[:1], {"mode": "rename", "prefix": prefix}).status_code, 400)
-        job = self.post([self.green()], {"mode": "cutout", "tolerance": 100}).json
+        buffer = io.BytesIO()
+        Image.new("RGBA", (20, 20), "#00ff00").save(buffer, "PNG")
+        buffer.seek(0)
+        response = self.client.post("/api/process", data={"options": json.dumps({"mode": "cutout", "tolerance": 100}), "files": (buffer, "empty.png")})
+        self.responses.append(response)
+        job = response.json
         self.assertTrue(job["warnings"])
         self.assertEqual(self.output(job).getchannel("A").getextrema(), (0, 0))
 

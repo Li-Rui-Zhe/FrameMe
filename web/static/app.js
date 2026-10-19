@@ -275,8 +275,11 @@ function updateFields() {
   const layout = form.elements.layout.value;
   $('#split-settings').hidden = mode !== 'split';
   $('#split-settings').disabled = mode !== 'split' || state.busy || state.importing;
-  $('#canvas-settings').hidden = mode === 'rename';
-  $('#canvas-settings').disabled = mode === 'rename' || state.busy || state.importing;
+  $('#canvas-settings').hidden = mode !== 'split';
+  $('#canvas-settings').disabled = mode !== 'split' || state.busy || state.importing;
+  if (mode === 'cutout') {
+    $('#size').value = '0'; $('#align').checked = false; $('#trim').checked = false;
+  }
   $('#background-settings').hidden = mode === 'rename';
   $('#background-settings').disabled = mode === 'rename' || state.busy || state.importing;
   $('#remove-bg-row').hidden = mode === 'cutout';
@@ -285,7 +288,7 @@ function updateFields() {
   $('#pick-color').disabled = state.busy || !state.source;
   $('#strip-fields').hidden = layout === 'grid';
   $('#grid-fields').hidden = layout !== 'grid';
-  $('#align').disabled = $('#size').value === '0' || state.busy;
+  $('#align').disabled = mode !== 'split' || state.busy;
   $('#alignment-fields').hidden = !$('#align').checked || $('#size').value === '0';
   $('#padding').closest('.field').hidden = !$('#align').checked;
   $('#layout-hint').textContent = layout === 'grid' ? '按从左到右、从上到下的顺序切割。' : layout === 'horizontal' ? '从左到右等分；原图模式可拖动裁剪线。' : '从上到下等分；原图模式可拖动裁剪线。';
@@ -328,6 +331,7 @@ function saveWorkspace() {
     state.formValues[element.name] = element.type === 'checkbox' ? element.checked : element.value;
   }
   state.demoFrames = demoFrames;
+  state.formValues.centeringVersion = '1';
   state.demoStrip = demoStrip;
   state.example = bytepetExample;
   state.advanced = $('#advanced-settings').open;
@@ -348,6 +352,7 @@ function restoreForm() {
       else element.value = value;
     }
   }
+  if (state.tool === 'split' && !state.formValues?.centeringVersion) $('#align').checked = true;
   $('#fps').value = String(state.fps);
   $('#advanced-settings').open = state.advanced;
   $('#preview-stage').dataset.background = state.background;
@@ -553,7 +558,7 @@ async function addFiles(fileList, { internal = false, origin = 'upload' } = {}) 
       $('#auto-color').checked = false;
       $('#color').value = '#33ff00';
       $('#size').value = '512';
-      $('#align').checked = false;
+      $('#align').checked = state.tool === 'split';
       $('#trim').checked = false;
       $('#tolerance').value = '18';
       $('#feather').value = '8';
@@ -939,12 +944,18 @@ async function processFiles(event) {
 
 function updateExportControls() {
   const picker = $('#export-format');
+  const cutout = state.tool === 'cutout';
+  const count = state.groups.reduce((total, group) => total + group.frames.length, 0);
+  // Background removal downloads the processed images directly, without animation formats.
+  picker.closest('.format-picker').hidden = cutout;
+  if (cutout) state.exportFormat = count > 1 ? 'zip' : 'png';
   // Renaming keeps independent images; GIF exports one source sequence only.
   picker.querySelector('[value="gif"]').disabled = state.tool === 'rename';
   if (state.tool === 'rename' && state.exportFormat === 'gif') state.exportFormat = 'zip';
   picker.value = state.exportFormat;
   picker.disabled = $('#quick-download').disabled = !state.job || state.dirty || state.busy || state.importing || exporting;
   $('#quick-download').innerHTML = '<svg class="icon"><use href="#i-download"></use></svg> ' + (exporting ? '正在准备…' : '下载 ' + (['gif', 'png', 'sheet'].includes(picker.value) ? picker.value === 'gif' ? 'GIF' : 'PNG' : 'ZIP'));
+  if (cutout && !exporting) $('#quick-download').innerHTML = '<svg class="icon"><use href="#i-download"></use></svg> ' + (count > 1 ? '下载全部透明图片（ZIP）' : '下载透明 PNG');
   const hints = {
     gif: '当前选中序列 · ' + state.fps + ' FPS · 循环播放；GIF 不保留半透明边缘',
     zip: '全部 PNG 逐帧图片 + 帧信息 JSON，打包下载',
@@ -953,6 +964,10 @@ function updateExportControls() {
     folders: '全部 PNG 按原素材分目录打包下载',
   };
   if (state.job && !state.dirty) $('#output-description').textContent = hints[picker.value];
+  if (cutout && state.job && !state.dirty) {
+    const resized = state.groups.some(group => group.frames.some(frame => frame.width !== group.source_size[0] || frame.height !== group.source_size[1]));
+    $('#output-description').textContent = resized ? '这是旧版已缩放的结果，请重新点击“移除背景”，以原图尺寸生成。' : count > 1 ? '仅打包去背景后的透明 PNG，不附带帧信息；每张图片保留原图尺寸。' : '下载去背景后的透明 PNG，保留原图尺寸与主体位置。';
+  }
 }
 
 async function download(kind) {
@@ -1368,6 +1383,7 @@ async function useBytePetDemo() {
     $('#frames').value = tool === 'split' ? entry.frames : 1;
     $('#size').value = '0';
     $('#prefix').value = tool === 'rename' ? 'asset' : entry.key;
+    $('#align').checked = tool === 'split';
     if (tool === 'split') { state.fps = entry.fps; $('#fps').value = String(entry.fps); }
     if (tool === 'cutout') {
       $('#remove-bg').checked = true; $('#tolerance').value = entry.tolerance; $('#feather').value = entry.feather;
@@ -1424,7 +1440,7 @@ form.addEventListener('input', event => {
   if (['layout', 'frames', 'rows', 'columns'].includes(event.target.name)) state.bounds = [];
   markDirty(); updateSteps(); draw();
 });
-$('#reset-settings').addEventListener('click', () => { form.reset(); state.bounds = []; $('#size').value = state.tool === 'split' ? '256' : '0'; markDirty(); draw(); toast('已恢复默认参数。'); });
+$('#reset-settings').addEventListener('click', () => { form.reset(); state.bounds = []; $('#size').value = '0'; markDirty(); draw(); toast('已恢复默认参数。'); });
 for (const [id, delta] of [['decrease-frames', -1], ['increase-frames', 1]]) {
   $('#' + id).addEventListener('click', () => { $('#frames').value = Math.max(1, Math.min(128, (Number($('#frames').value) || 1) + delta)); state.bounds = []; markDirty(); draw(); });
 }

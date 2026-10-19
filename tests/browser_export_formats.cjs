@@ -19,7 +19,8 @@ async function demo(tool) {
   await page.waitForFunction(() => !document.querySelector('#quick-download').disabled);
 }
 async function download(kind, filename) {
-  await page.locator('#export-format').selectOption(kind);
+  if (await page.locator('.format-picker').isVisible()) await page.locator('#export-format').selectOption(kind);
+  else assert.equal(await page.locator('#export-format').inputValue(), kind);
   const pending = page.waitForEvent('download');
   await page.locator('#quick-download').click();
   const file = await pending;

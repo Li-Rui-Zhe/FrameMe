@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import math
 from statistics import median
-from PIL import Image, ImageChops, ImageColor
+from PIL import Image, ImageChops, ImageColor, ImageDraw, ImageFilter
 
 
 def remove_color(image, options):
@@ -29,9 +29,42 @@ def remove_color(image, options):
     difference = ImageChops.difference(image.convert("RGB"), Image.new("RGB", image.size, color))
     red, green, blue = difference.split()
     distance = ImageChops.lighter(ImageChops.lighter(red, green), blue)
-    threshold, feather = options["tolerance"] * 2.55, options["feather"]
-    mask = distance.point([0 if value <= threshold else min(255, round((value - threshold) / feather * 255)) if feather else 255 for value in range(256)])
+    # Flood only background connected to the image border. Matching colours
+    # inside clothing/eyes are not evidence that those pixels are background.
+    # Cap the threshold so raising tolerance cannot erase every colour.
+    threshold, feather = min(options["tolerance"] * 2.55, 160), options["feather"]
+    candidate = distance.point([255 if value <= threshold else 0 for value in range(256)])
+    candidate = ImageChops.lighter(candidate, image.getchannel("A").point(lambda a: 255 if a == 0 else 0))
+    padded = Image.new("L", (image.width + 2, image.height + 2), 255)
+    padded.paste(candidate, (1, 1))
+    ImageDraw.floodfill(padded, (0, 0), 128)
+    background = padded.crop((1, 1, image.width + 1, image.height + 1)).point(lambda v: 255 if v == 128 else 0)
+    mask = ImageChops.invert(background)
     result = image.copy()
+    # Estimate the edge mixture from nearby foreground, then unmix the key
+    # colour instead of merely making a green/blue fringe more transparent.
+    # Restrict this to a narrow outer band; opaque interior pixels stay exact.
+    if feather:
+        band = ImageChops.subtract(background.filter(ImageFilter.MaxFilter(5)), background)
+        local_distance = distance.filter(ImageFilter.MaxFilter(7))
+        source, dst, alpha = image.load(), result.load(), mask.load()
+        dist, nearby = distance.load(), local_distance.load()
+        bounds = band.getbbox()
+        if bounds:
+            edge = band.load()
+            for y in range(bounds[1], bounds[3]):
+                for x in range(bounds[0], bounds[2]):
+                    if not edge[x, y]:
+                        continue
+                    d, peak = dist[x, y], nearby[x, y]
+                    if peak <= threshold or d >= peak:
+                        continue
+                    opacity = max(0.01, min(1.0, d / peak))
+                    # Feather controls strength, independently from tolerance.
+                    opacity = 1 - (1 - opacity) * min(1, feather / 8)
+                    pixel = source[x, y]
+                    dst[x, y] = tuple(max(0, min(255, round((pixel[c] - color[c] * (1 - opacity)) / opacity))) for c in range(3)) + (pixel[3],)
+                    alpha[x, y] = round(opacity * 255)
     result.putalpha(ImageChops.multiply(image.getchannel("A"), mask))
     return result
 
@@ -70,9 +103,18 @@ def fit_frames(frames, options, reference_frames=None):
     if len(drawing_frames) != len(frames) or any(a.size != b.size for a, b in zip(frames, drawing_frames)):
         raise ValueError("参考图尺寸与处理图不匹配")
     size, padding = options["size"], options["padding"]
-    if not size and not options["trim"]:
+    if not size and not options["trim"] and not options["align"]:
         return drawing_frames
     boxes = [frame.getchannel("A").point(lambda value: 255 if value > 10 else 0).getbbox() for frame in frames]
+    if not size and options["align"]:
+        results = []
+        for frame, box in zip(drawing_frames, boxes):
+            canvas = Image.new("RGBA", frame.size)
+            if box:
+                subject = frame.crop(box)
+                canvas.alpha_composite(subject, ((frame.width - subject.width) // 2, (frame.height - subject.height) // 2))
+            results.append(canvas)
+        return results
     if not size:
         return [frame.crop(box) if box else Image.new("RGBA", (1, 1)) for frame, box in zip(drawing_frames, boxes)]
     align = options["align"] or options["trim"]
@@ -91,7 +133,7 @@ def fit_frames(frames, options, reference_frames=None):
         subject = frame.crop(box) if align else frame
         target = subject.resize((max(1, round(subject.width * scale)), max(1, round(subject.height * scale))), Image.Resampling.LANCZOS)
         x = (size - target.width) // 2
-        y = size - padding - target.height if align else (size - target.height) // 2
+        y = (size - target.height) // 2
         canvas.alpha_composite(target, (x, y))
         results.append(canvas)
     return results

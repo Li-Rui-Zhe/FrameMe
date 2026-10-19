@@ -73,6 +73,9 @@ def validate_options(options):
     if mode not in {"split", "cutout", "rename"}:
         raise ValueError("未知的处理方式")
     options = dict(options)
+    if mode == "cutout":
+        # Removing a background must not resize or crop even restored old drafts.
+        options.update(size=0, padding=0, align=False, trim=False)
     if mode != "split":
         options.update(frames=1, rows=1, columns=1, bounds=[], layout="horizontal")
         layout = "horizontal"
@@ -516,8 +519,9 @@ def job_export(job_id, kind):
                 for frame in group["frames"]:
                     archive_name = f"{folder}/{frame['filename']}" if kind == "folders" else frame["filename"]
                     archive.write(directory / frame["filename"], arcname=archive_name)
-            archive.writestr("frames.json", json.dumps({"generator": "FrameMe 3.0", "options": manifest["options"], "groups": manifest["groups"]}, ensure_ascii=False, indent=2))
-        suffix = "folders" if kind == "folders" else "frames"
+            if manifest["options"]["mode"] != "cutout":
+                archive.writestr("frames.json", json.dumps({"generator": "FrameMe 3.0", "options": manifest["options"], "groups": manifest["groups"]}, ensure_ascii=False, indent=2))
+        suffix = "images" if manifest["options"]["mode"] == "cutout" else "folders" if kind == "folders" else "frames"
         mimetype, filename = "application/zip", f"{prefix}_{suffix}.zip"
     elif kind == "sheet":
         columns = min(8, math.ceil(math.sqrt(len(records))))
